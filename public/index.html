@@ -552,7 +552,7 @@ const Store = {
     this.cid = store('hm_cid') || (crypto.randomUUID ? crypto.randomUUID().replace(/-/g,'') : Math.random().toString(36).slice(2)+Date.now().toString(36));
     store('hm_cid', this.cid);
     await this.refresh();
-    setInterval(()=>{ if(!document.hidden) this.refresh(); }, 30000);
+    setInterval(()=>{ if(!document.hidden) this.refresh(); }, 15000);
     document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) this.refresh(); });
   },
   async refresh(){
