@@ -37,6 +37,22 @@ async function setup() {
     )`);
     await db.execute(`CREATE INDEX IF NOT EXISTS idx_${t}_date ON ${t}(date)`);
   }
+  await db.execute(`CREATE TABLE IF NOT EXISTS bookings (
+    id TEXT PRIMARY KEY,
+    rideId TEXT NOT NULL,
+    token TEXT NOT NULL,
+    client TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    cancelReq TEXT,
+    seats INTEGER NOT NULL,
+    whole INTEGER NOT NULL DEFAULT 0,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+  )`);
+  await db.execute(`CREATE INDEX IF NOT EXISTS idx_bookings_ride ON bookings(rideId)`);
 }
 
 /* ---------- cache: lists are read from the DB only after something changes ---------- */
@@ -83,6 +99,7 @@ function validate(kind, b) {
     d.via = str(b.via, 120);
     d.car = str(b.car, 40);
     d.fare = optNum(b.fare);
+    d.wholeFare = optNum(b.wholeFare);
     d.allows = Array.isArray(b.allows) ? [...new Set(b.allows.filter(a => SEAT.includes(a)))] : [];
     if (!d.allows.length) return 'allows';
   } else {
@@ -177,6 +194,9 @@ app.patch('/api/:kind/:id', kindOk, wrap(async (req, res) => {
 app.delete('/api/:kind/:id', kindOk, wrap(async (req, res) => {
   const auth = await authorize(req, res); if (!auth) return;
   await db.execute({ sql: `DELETE FROM ${req.params.kind} WHERE id = ?`, args: [auth.row.id] });
+  if (req.params.kind === 'rides') {
+    await db.execute({ sql: `UPDATE bookings SET status = 'ride_deleted', cancelReq = NULL, updatedAt = ? WHERE rideId = ? AND status IN ('pending','confirmed')`, args: [Date.now(), auth.row.id] });
+  }
   invalidate(req.params.kind);
   res.json({ ok: true });
 }));
@@ -199,6 +219,140 @@ app.post('/api/:kind/:id/report', kindOk, reportLimiter, wrap(async (req, res) =
   res.json({ ok: true });
 }));
 
+
+/* ---------- bookings ---------- */
+// Seat changes go through one queue so two accepts can't both take the last seat.
+let chain = Promise.resolve();
+const serial = fn => (chain = chain.then(fn, fn));
+
+const bookLimiter = rateLimit({ windowMs: 3600e3, limit: 10, keyGenerator: req => clientId(req) || 'ip:' + req.ip, handler: (req, res) => fail(res, 429, 'rate') });
+const hashClient = c => crypto.createHash('sha256').update(c).digest('hex').slice(0, 16);
+const rideStarted = d => new Date(`${d.date}T${d.time || '23:59'}:00+05:00`).getTime() < Date.now();
+
+async function getRide(id) {
+  const { rows } = await db.execute({ sql: `SELECT * FROM rides WHERE id = ?`, args: [id] });
+  return rows[0] || null;
+}
+async function saveRideSeats(row, data, status) {
+  await db.execute({ sql: `UPDATE rides SET data = ?, status = ? WHERE id = ?`, args: [JSON.stringify(data), status, row.id] });
+  invalidate('rides');
+}
+const pubBooking = (b, ride) => ({
+  id: b.id, rideId: b.rideId, status: b.status, cancelReq: b.cancelReq || null, seats: Number(b.seats), whole: !!Number(b.whole),
+  name: b.name, phone: b.phone, note: b.note, createdAt: Number(b.createdAt), updatedAt: Number(b.updatedAt),
+  ride: ride ? (() => { const d = JSON.parse(ride.data); return { from: d.from, to: d.to, date: ride.date, time: d.time, name: d.name, phone: d.phone, fare: d.fare, wholeFare: d.wholeFare, status: ride.status }; })() : null,
+});
+
+// Passenger asks for seats (or the whole car).
+app.post('/api/rides/:id/bookings', ipLimiter, bookLimiter, wrap(async (req, res) => {
+  const cid = clientId(req); if (!cid) return fail(res, 400, 'generic');
+  const b = req.body || {};
+  const name = str(b.name, 50), phone = str(b.phone, 20), note = str(b.note, 200);
+  if (!name) return fail(res, 400, 'name');
+  if (!phoneOk(phone)) return fail(res, 400, 'phone');
+  const out = await serial(async () => {
+    const ride = await getRide(req.params.id);
+    if (!ride || Number(ride.hidden)) return [404, 'notfound'];
+    const d = JSON.parse(ride.data);
+    if (ride.status !== 'open' || rideStarted({ date: ride.date, time: d.time })) return [400, 'closed'];
+    const whole = !!b.whole && !!d.wholeFare;
+    const seats = whole ? Number(d.seats) : num(b.seats, 1, 15);
+    if (!seats) return [400, 'seats'];
+    if (seats > Number(d.seats)) return [400, 'full'];
+    const client = hashClient(cid);
+    const dup = await db.execute({ sql: `SELECT id FROM bookings WHERE rideId = ? AND client = ? AND status IN ('pending','confirmed')`, args: [ride.id, client] });
+    if (dup.rows.length) return [400, 'dup'];
+    const id = crypto.randomUUID(), token = crypto.randomBytes(18).toString('hex'), now = Date.now();
+    await db.execute({
+      sql: `INSERT INTO bookings (id, rideId, token, client, seats, whole, name, phone, note, createdAt, updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+      args: [id, ride.id, token, client, seats, whole ? 1 : 0, name, phone, note, now, now],
+    });
+    return [201, { id, token }];
+  });
+  if (typeof out[1] === 'string') return fail(res, out[0], out[1]);
+  res.status(201).json(out[1]);
+}));
+
+// Everything one browser is involved in: bookings on its rides (as driver) and its own bookings (as passenger).
+app.post('/api/bookings/mine', wrap(async (req, res) => {
+  const rides = Array.isArray(req.body?.rides) ? req.body.rides.slice(0, 50) : [];
+  const mine = Array.isArray(req.body?.bookings) ? req.body.bookings.slice(0, 100) : [];
+  const driver = {};
+  for (const r of rides) {
+    const ride = await getRide(String(r.id || ''));
+    if (!ride || (r.token !== ride.token && !(ADMIN_KEY && r.token === ADMIN_KEY))) continue;
+    const { rows } = await db.execute({ sql: `SELECT * FROM bookings WHERE rideId = ? ORDER BY createdAt`, args: [ride.id] });
+    driver[ride.id] = rows.map(b => pubBooking(b, null));
+  }
+  const passenger = [];
+  for (const m of mine) {
+    const { rows } = await db.execute({ sql: `SELECT * FROM bookings WHERE id = ?`, args: [String(m.id || '')] });
+    const b = rows[0];
+    if (!b || b.token !== m.token) continue;
+    passenger.push(pubBooking(b, await getRide(b.rideId)));
+  }
+  res.json({ driver, passenger });
+}));
+
+// Accept, decline, withdraw, and the two-sided cancellation.
+// Driver uses the ride's edit key; passenger uses the booking's key.
+const PASSENGER_ACTIONS = ['withdraw', 'request_cancel', 'approve_cancel', 'reject_cancel', 'undo_cancel'];
+const DRIVER_ACTIONS = ['accept', 'decline', 'request_cancel', 'approve_cancel', 'reject_cancel', 'undo_cancel'];
+app.post('/api/bookings/:id/action', wrap(async (req, res) => {
+  const key = req.get('x-edit-token') || '', action = String(req.body?.action || '');
+  const out = await serial(async () => {
+    const { rows } = await db.execute({ sql: `SELECT * FROM bookings WHERE id = ?`, args: [req.params.id] });
+    const bk = rows[0]; if (!bk) return [404, 'notfound'];
+    const ride = await getRide(bk.rideId);
+    let role = null;
+    if (key && key === bk.token) role = 'passenger';
+    else if (ride && key && (key === ride.token || (ADMIN_KEY && key === ADMIN_KEY))) role = 'driver';
+    if (!role) return [403, 'forbidden'];
+    if (!(role === 'driver' ? DRIVER_ACTIONS : PASSENGER_ACTIONS).includes(action)) return [400, 'state'];
+    const other = role === 'driver' ? 'passenger' : 'driver';
+    let status = bk.status, cancelReq = bk.cancelReq || null, seatDelta = 0;
+
+    if (action === 'accept') {
+      if (status !== 'pending' || !ride) return [400, 'state'];
+      const d = JSON.parse(ride.data);
+      if (Number(bk.seats) > Number(d.seats)) return [400, 'full'];
+      status = 'confirmed'; seatDelta = -Number(bk.seats);
+    } else if (action === 'decline') {
+      if (status !== 'pending') return [400, 'state'];
+      status = 'declined';
+    } else if (action === 'withdraw') {
+      if (status !== 'pending') return [400, 'state'];
+      status = 'withdrawn';
+    } else if (action === 'request_cancel') {
+      if (status !== 'confirmed' || cancelReq) return [400, 'state'];
+      cancelReq = role;
+    } else if (action === 'undo_cancel') {
+      if (status !== 'confirmed' || cancelReq !== role) return [400, 'state'];
+      cancelReq = null;
+    } else if (action === 'approve_cancel') {
+      // Only the side that did NOT ask can agree, so both have agreed.
+      if (status !== 'confirmed' || cancelReq !== other) return [400, 'state'];
+      status = 'cancelled'; cancelReq = null; seatDelta = Number(bk.seats);
+    } else if (action === 'reject_cancel') {
+      if (status !== 'confirmed' || cancelReq !== other) return [400, 'state'];
+      cancelReq = null;
+    }
+
+    if (seatDelta && ride) {
+      const d = JSON.parse(ride.data);
+      d.seats = Math.max(0, Number(d.seats) + seatDelta);
+      let rs = ride.status;
+      if (d.seats === 0) { rs = 'closed'; d.autoFull = true; }
+      else if (seatDelta > 0 && d.autoFull) { rs = 'open'; d.autoFull = false; }
+      await saveRideSeats(ride, d, rs);
+    }
+    await db.execute({ sql: `UPDATE bookings SET status = ?, cancelReq = ?, updatedAt = ? WHERE id = ?`, args: [status, cancelReq, Date.now(), bk.id] });
+    return [200, { ok: true, status, cancelReq }];
+  });
+  if (typeof out[1] === 'string') return fail(res, out[0], out[1]);
+  res.json(out[1]);
+}));
+
 // Admin: see hidden (reported) posts so you can delete or restore them.
 app.get('/api/admin/hidden', wrap(async (req, res) => {
   if (!ADMIN_KEY || req.get('x-edit-token') !== ADMIN_KEY) return fail(res, 403, 'forbidden');
@@ -212,6 +366,7 @@ app.get('/api/admin/hidden', wrap(async (req, res) => {
 
 async function cleanup() {
   for (const t of KINDS) await db.execute({ sql: `DELETE FROM ${t} WHERE date < ?`, args: [sinceDate()] });
+  await db.execute({ sql: `DELETE FROM bookings WHERE createdAt < ?`, args: [Date.now() - KEEP_DAYS * 864e5] });
   KINDS.forEach(invalidate);
 }
 
