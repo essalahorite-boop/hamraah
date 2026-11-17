@@ -289,6 +289,34 @@ h4{font-size:17px;margin:24px 0 12px}
 .dgrid b{font-size:15px}
 .dfoot{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px calc(14px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr auto;gap:10px}
 
+/* ---------- bookings ---------- */
+.acts .full,.dfoot .full{grid-column:1/-1}
+.btn.mybk{background:var(--limesoft);color:var(--green);border:1.5px solid var(--lime)}
+.price .whole{font-size:14px;color:var(--muted);margin-top:2px}
+.price .whole b{font-size:15px;color:var(--ink)}
+.ridewrap{display:grid;gap:0}
+.ridewrap .ride{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.bkpanel{background:#FAFBF8;border-radius:0 0 var(--r) var(--r);box-shadow:var(--shadow);padding:14px;display:grid;gap:10px;border-top:1px dashed var(--line)}
+.bklist{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.bk{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:8px}
+.bklist .bk{box-shadow:var(--shadow);border:0}
+.bkhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.bkhead b{font-size:16px}
+.st{display:inline-flex;padding:3px 11px;border-radius:99px;font-size:13px;font-weight:700;background:#F0F2EE;color:var(--muted)}
+.st.pending{background:var(--amberbg);color:var(--amber)}
+.st.confirmed{background:var(--limesoft);color:var(--green)}
+.st.declined,.st.ride_deleted{background:#FDECEA;color:var(--red)}
+.ask{background:var(--amberbg);color:var(--amber);border-radius:10px;padding:8px 10px;font-weight:700;font-size:14px}
+.ask.soft{background:#F0F2EE;color:var(--muted);font-weight:600}
+.total{font-size:18px;font-weight:800;color:var(--green)}
+.total:empty{display:none}
+.nudge{text-align:center;justify-items:center;padding:28px 20px}
+.nudge .btn{width:100%;max-width:380px}
+.nudge .tick{width:64px;height:64px;border-radius:50%;background:var(--limesoft);color:var(--green);display:grid;place-items:center;font-size:32px;font-weight:800}
+nav a{position:relative}
+nav a.alert::after{content:'';position:absolute;top:6px;inset-inline-end:10px;width:10px;height:10px;border-radius:50%;background:#E5484D;border:2px solid #fff}
+@media (max-width:900px){.bklist{grid-template-columns:1fr} nav a.alert::after{top:2px;inset-inline-end:calc(50% - 18px)}}
+
 /* ---------- misc ---------- */
 .head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:16px}
 .head h2{margin:0;font-size:20px}
@@ -333,6 +361,26 @@ const CITIES = {
 };
 const T = {
 en:{
+  reqSeats:'Request seats', bookH:'Request seats', bookSub:'The driver will accept or decline. Your seat is only booked once the driver accepts.',
+  bookSeatsOpt:'Some seats', bookWholeOpt:'Whole car', howManySeats:'How many seats?', total:'Total', sendReq:'Send request', sending:'Sending…',
+  reqSent:'Request sent', reqSentSub:'Now let the driver know on WhatsApp so they can accept it.', tellDriver:'Tell the driver on WhatsApp', tellPassenger:'Tell the passenger on WhatsApp',
+  tellOther:'Let them know on WhatsApp so they see it.', seeMine:'See my bookings', wholeCar:'Whole car', wholeFareL:'Whole car fare (Rs)', wholeHint:'Optional. Lets a family or group book the whole car.',
+  ph_bookNote:'e.g. 2 adults, 1 small bag', driverL:'Driver', saved:'Saved',
+  myBookings:'My bookings', noMyBookings:'You haven\'t booked any seats.', bookingsOnRide:'Booking requests', noBookings:'No booking requests yet.',
+  st_pending:'Waiting for driver', st_pending_d:'New request', st_confirmed:'Confirmed', st_declined:'Declined', st_withdrawn:'Withdrawn',
+  st_cancelled:'Cancelled (both agreed)', st_ride_deleted:'Ride removed by driver', yourBooking:'Your booking: {s}',
+  cr_mine:'You asked to cancel. Waiting for the other person to agree.', cr_driver_to_p:'The driver wants to cancel this booking. Do you agree?', cr_passenger_to_d:'The passenger wants to cancel this booking. Do you agree?',
+  a_accept:'Accept', a_decline:'Decline', a_withdraw:'Withdraw request', a_request_cancel:'Ask to cancel', a_approve_cancel:'Agree to cancel', a_reject_cancel:'Keep booking', a_undo_cancel:'Undo cancel request',
+  a_done_accept:'Booking accepted', a_done_decline:'Booking declined', a_done_request_cancel:'Cancellation requested', a_done_approve_cancel:'Booking cancelled',
+  tapConfirm:'Tap again to confirm', seatsN:'{n} seat(s)',
+  err_full:'Not enough seats left.', err_closed:'This ride is full or has already left.', err_dup:'You already have a request for this ride. See My posts.', err_state:'This booking has changed. The page has been refreshed.',
+  wa_book:'Assalam o Alaikum, I have requested {n} on Hamraah for your ride {r} ({d}). Please accept it in My posts.',
+  wa_accept:'Assalam o Alaikum, your booking ({n}) for {r} ({d}) is confirmed on Hamraah.',
+  wa_decline:'Sorry, I could not accept your booking for {r} ({d}) on Hamraah.',
+  wa_cancel_p:'Assalam o Alaikum, I have asked to cancel my booking for {r} ({d}) on Hamraah. Please agree in My posts.',
+  wa_cancel_d:'Assalam o Alaikum, I need to cancel your booking for {r} ({d}) on Hamraah. Please agree in My posts.',
+  wa_cancelled:'Our booking for {r} ({d}) on Hamraah is now cancelled.',
+  wa_hello:'Assalam o Alaikum, about my Hamraah booking for {r} ({d}):', wa_hello_p:'Assalam o Alaikum, about your Hamraah booking for {r} ({d}):',
   heroA:'Your journey,', heroB:'shared', heroSub:'Find affordable rides between Hazara and the twin cities. Travel together.',
   searchBtn:'Search rides', searchReqBtn:'Find passengers', tagline:'Ride together. Go further.',
   trust1:'Free to use', trust1s:'No fees, no sign-up', trust2:'Talk directly', trust2s:'Message on WhatsApp',
@@ -390,6 +438,26 @@ en:{
   waReq:'Assalam o Alaikum, I saw your seat request {r} on {d} on Hamraah. I have seats available.'
 },
 ur:{
+  reqSeats:'سیٹ بک کریں', bookH:'سیٹ کی درخواست', bookSub:'ڈرائیور قبول یا رد کرے گا۔ ڈرائیور کے قبول کرنے پر ہی سیٹ بک ہو گی۔',
+  bookSeatsOpt:'کچھ سیٹیں', bookWholeOpt:'پوری گاڑی', howManySeats:'کتنی سیٹیں؟', total:'کل', sendReq:'درخواست بھیجیں', sending:'بھیجی جا رہی ہے…',
+  reqSent:'درخواست بھیج دی گئی', reqSentSub:'اب ڈرائیور کو واٹس ایپ پر بتائیں تاکہ وہ قبول کر لے۔', tellDriver:'ڈرائیور کو واٹس ایپ پر بتائیں', tellPassenger:'مسافر کو واٹس ایپ پر بتائیں',
+  tellOther:'واٹس ایپ پر بتا دیں تاکہ انہیں معلوم ہو جائے۔', seeMine:'میری بکنگز دیکھیں', wholeCar:'پوری گاڑی', wholeFareL:'پوری گاڑی کا کرایہ (روپے)', wholeHint:'اختیاری۔ فیملی یا گروپ پوری گاڑی بک کر سکیں گے۔',
+  ph_bookNote:'مثلاً 2 بڑے، 1 چھوٹا بیگ', driverL:'ڈرائیور', saved:'محفوظ ہو گیا',
+  myBookings:'میری بکنگز', noMyBookings:'آپ نے کوئی سیٹ بک نہیں کی۔', bookingsOnRide:'بکنگ کی درخواستیں', noBookings:'ابھی کوئی بکنگ کی درخواست نہیں۔',
+  st_pending:'ڈرائیور کا انتظار', st_pending_d:'نئی درخواست', st_confirmed:'کنفرم', st_declined:'رد ہو گئی', st_withdrawn:'واپس لے لی گئی',
+  st_cancelled:'منسوخ (دونوں کی رضامندی سے)', st_ride_deleted:'ڈرائیور نے سواری ہٹا دی', yourBooking:'آپ کی بکنگ: {s}',
+  cr_mine:'آپ نے منسوخی کی درخواست کی ہے۔ دوسرے کی رضامندی کا انتظار ہے۔', cr_driver_to_p:'ڈرائیور یہ بکنگ منسوخ کرنا چاہتا ہے۔ کیا آپ راضی ہیں؟', cr_passenger_to_d:'مسافر یہ بکنگ منسوخ کرنا چاہتا ہے۔ کیا آپ راضی ہیں؟',
+  a_accept:'قبول کریں', a_decline:'رد کریں', a_withdraw:'درخواست واپس لیں', a_request_cancel:'منسوخی کی درخواست', a_approve_cancel:'منسوخی پر راضی ہوں', a_reject_cancel:'بکنگ برقرار رکھیں', a_undo_cancel:'منسوخی کی درخواست واپس لیں',
+  a_done_accept:'بکنگ قبول ہو گئی', a_done_decline:'بکنگ رد کر دی گئی', a_done_request_cancel:'منسوخی کی درخواست بھیج دی گئی', a_done_approve_cancel:'بکنگ منسوخ ہو گئی',
+  tapConfirm:'تصدیق کے لیے دوبارہ دبائیں', seatsN:'{n} سیٹیں',
+  err_full:'اتنی سیٹیں باقی نہیں۔', err_closed:'یہ سواری بھر چکی ہے یا روانہ ہو چکی ہے۔', err_dup:'اس سواری کے لیے آپ کی درخواست پہلے سے موجود ہے۔ “میری پوسٹیں” دیکھیں۔', err_state:'یہ بکنگ بدل چکی ہے۔ صفحہ تازہ کر دیا گیا ہے۔',
+  wa_book:'السلام علیکم، میں نے ہمراہ پر آپ کی سواری {r} ({d}) کے لیے {n} کی درخواست بھیجی ہے۔ براہ کرم “میری پوسٹیں” میں قبول کر لیں۔',
+  wa_accept:'السلام علیکم، ہمراہ پر {r} ({d}) کے لیے آپ کی بکنگ ({n}) کنفرم ہو گئی ہے۔',
+  wa_decline:'معذرت، میں ہمراہ پر {r} ({d}) کے لیے آپ کی بکنگ قبول نہیں کر سکا۔',
+  wa_cancel_p:'السلام علیکم، میں نے ہمراہ پر {r} ({d}) کی اپنی بکنگ منسوخ کرنے کی درخواست کی ہے۔ براہ کرم “میری پوسٹیں” میں منظور کر دیں۔',
+  wa_cancel_d:'السلام علیکم، مجھے ہمراہ پر {r} ({d}) کے لیے آپ کی بکنگ منسوخ کرنی ہے۔ براہ کرم “میری پوسٹیں” میں منظور کر دیں۔',
+  wa_cancelled:'ہمراہ پر {r} ({d}) کی ہماری بکنگ منسوخ ہو گئی ہے۔',
+  wa_hello:'السلام علیکم، ہمراہ پر {r} ({d}) کی میری بکنگ کے بارے میں:', wa_hello_p:'السلام علیکم، ہمراہ پر {r} ({d}) کی آپ کی بکنگ کے بارے میں:',
   heroA:'آپ کا سفر،', heroB:'ساتھ ساتھ', heroSub:'ہزارہ اور جڑواں شہروں کے درمیان سستی سواری ڈھونڈیں۔ ساتھ سفر کریں۔',
   searchBtn:'سواری ڈھونڈیں', searchReqBtn:'مسافر ڈھونڈیں', tagline:'ساتھ چلیں، دور تک',
   trust1:'بالکل مفت', trust1s:'نہ فیس، نہ سائن اپ', trust2:'سیدھا رابطہ', trust2s:'واٹس ایپ پر بات کریں',
@@ -478,9 +546,9 @@ function store(k, v){ try{ if(v===undefined) return localStorage.getItem(k); loc
 
 /* ================= API store ================= */
 const Store = {
-  rides:[], requests:[], loaded:false, error:null, tokens:{}, reportedIds:[], cid:'',
+  rides:[], requests:[], loaded:false, error:null, tokens:{}, btokens:{}, B:{driver:{},passenger:[]}, reportedIds:[], cid:'',
   async init(){
-    try{ this.tokens = JSON.parse(store('hm_tokens')||'{}'); this.reportedIds = JSON.parse(store('hm_reported')||'[]'); }catch(e){}
+    try{ this.tokens = JSON.parse(store('hm_tokens')||'{}'); this.btokens = JSON.parse(store('hm_btokens')||'{}'); this.reportedIds = JSON.parse(store('hm_reported')||'[]'); }catch(e){}
     this.cid = store('hm_cid') || (crypto.randomUUID ? crypto.randomUUID().replace(/-/g,'') : Math.random().toString(36).slice(2)+Date.now().toString(36));
     store('hm_cid', this.cid);
     await this.refresh();
@@ -491,6 +559,9 @@ const Store = {
     try{
       const [r,q] = await Promise.all(['rides','requests'].map(k=>fetch('/api/'+k).then(x=>{ if(!x.ok) throw 0; return x.json(); })));
       this.rides=r; this.requests=q; this.error=null;
+      const rides = Object.keys(this.tokens).filter(id=>r.some(x=>x.id===id)).map(id=>({id, token:this.tokens[id]}));
+      const bookings = Object.entries(this.btokens).map(([id,token])=>({id, token}));
+      if(rides.length || bookings.length){ this.B = await this.call('POST','/api/bookings/mine',{rides, bookings}); }
     }catch(e){ this.error='offline'; }
     this.loaded=true; render();
   },
@@ -508,7 +579,9 @@ const Store = {
   async update(kind, id, patch){ await this.call('PATCH',`/api/${kind}/${id}`, patch, this.tokens[id]); await this.refresh(); },
   async remove(kind, id){ await this.call('DELETE',`/api/${kind}/${id}`, null, this.tokens[id]); delete this.tokens[id]; this.saveTokens(); await this.refresh(); },
   async report(kind, id){ await this.call('POST',`/api/${kind}/${id}/report`); this.reportedIds.push(id); store('hm_reported', JSON.stringify(this.reportedIds)); },
-  mine(x){ return !!this.tokens[x.id]; }
+  mine(x){ return !!this.tokens[x.id]; },
+  async book(rideId, data){ const { id, token } = await this.call('POST',`/api/rides/${rideId}/bookings`, data); this.btokens[id]=token; store('hm_btokens', JSON.stringify(this.btokens)); await this.refresh(); },
+  activeBookingFor(rideId){ return this.B.passenger.find(b=>b.rideId===rideId && ['pending','confirmed'].includes(b.status)); }
 };
 const errText = e => t('err_'+((e&&e.code)||'generic'));
 
@@ -722,6 +795,13 @@ function ownerExtra(kind, x, n){
   } else out += Store.reportedIds.includes(x.id) ? `<span class="hint" style="margin:0">${t('reported')}</span>` : `<button class="linkbtn" data-report="${kind}:${x.id}" style="margin-inline-start:auto">⚑ ${t('report')}</button>`;
   return `<div class="extra">${out}</div>`;
 }
+function bookButton(r){
+  if(Store.mine(r)) return '';
+  const b = Store.activeBookingFor(r.id);
+  if(b) return `<a class="btn mybk full" href="#mine">${t('yourBooking',{s:t('st_'+b.status)})}</a>`;
+  if(r.status!=='open' || isPast(r)) return '';
+  return `<button class="btn full" data-book="${r.id}">${t('reqSeats')}</button>`;
+}
 function rideCard(r, withMatches=true){
   const n = withMatches ? activeReqs().filter(q=>rideFits(r,q)).length : 0;
   const closed = r.status!=='open';
@@ -735,8 +815,8 @@ function rideCard(r, withMatches=true){
       <div class="driver"><span class="avatar">${esc(String(r.name||'?').trim().charAt(0).toUpperCase())}</span><div><b>${esc(r.name)}</b><span>${esc(r.car||t('lug_'+(r.luggage||'medium')))}</span></div></div>
     </div>
     <div class="side">
-      <div class="price">${r.fare?`<b>${t('rs')} ${money(r.fare)}</b> <span>${t('perSeat')}</span>`:`<span class="open">${t('fareOnCall')}</span>`}</div>
-      <div class="acts"><button class="btn lime" data-detail="rides:${r.id}">${t('details')}</button><a class="btn" href="${waLink(r.phone,msg)}" target="_blank" rel="noopener">${ICON.wa} ${t('whatsapp')}</a></div>
+      <div class="price">${r.fare?`<b>${t('rs')} ${money(r.fare)}</b> <span>${t('perSeat')}</span>`:`<span class="open">${t('fareOnCall')}</span>`}${r.wholeFare?`<div class="whole">${t('wholeCar')}: <b>${t('rs')} ${money(r.wholeFare)}</b></div>`:''}</div>
+      <div class="acts">${bookButton(r)}<button class="btn lime" data-detail="rides:${r.id}">${t('details')}</button><a class="btn ghost" href="${waLink(r.phone,msg)}" target="_blank" rel="noopener">${ICON.wa} ${t('whatsapp')}</a></div>
     </div>
     ${ownerExtra('rides', r, n)}
   </article>`;
@@ -781,9 +861,131 @@ function detailSheet(kind, x){
     ${x.notes?`<div class="dgrid"><div style="grid-column:1/-1"><span>${t('notesL')}</span><b>${esc(x.notes)}</b></div></div>`:''}
     <div class="driver"><span class="avatar">${esc(String(x.name||'?').trim().charAt(0).toUpperCase())}</span><div><b>${esc(x.name)}</b><span class="ltr">${esc(x.phone)}</span></div></div>
   </div>
-  <div class="dfoot"><a class="btn big" href="${waLink(x.phone,msg)}" target="_blank" rel="noopener">${ICON.wa} ${t('waLong')}</a><button class="btn ghost big" data-copy="${esc(x.phone)}">${t('copy')}</button></div>`;
+  <div class="dfoot">${isR?bookButton(x).replace('btn full','btn big full').replace('btn mybk full','btn big mybk full'):''}<a class="btn big ${isR&&bookButton(x)?'ghost':''}" href="${waLink(x.phone,msg)}" target="_blank" rel="noopener">${ICON.wa} ${t('waLong')}</a><button class="btn ghost big" data-copy="${esc(x.phone)}">${t('copy')}</button></div>`;
 }
 function fmtTime(tm){ if(!tm) return ''; return new Date('2000-01-01T'+tm).toLocaleTimeString(LANG==='ur'?'ur-PK':'en-US',{hour:'numeric',minute:'2-digit'}); }
+
+/* ================= bookings ================= */
+const bkStatus = (b, role) => b.status==='pending' && role==='driver' ? t('st_pending_d') : t('st_'+b.status);
+const seatsText = b => b.whole ? t('wholeCar') : t('seatsN',{n:b.seats});
+function bookSheet(r){
+  const me = { name: store('hm_me_name')||'', phone: store('hm_me_phone')||'' };
+  const max = Number(r.seats)||1;
+  return `<div class="dbody">
+    <h2>${t('bookH')}</h2>
+    <div class="line">${esc(routeName(r.from,r.to))} <span class="sep">•</span> ${esc(fmtDate(r.date))} <span class="ltr">${esc(fmtTime(r.time))}</span></div>
+    <p class="hint" style="margin:0">${t('bookSub')}</p>
+    <form id="bform" class="form" novalidate>
+      ${r.wholeFare?`<div class="seg" style="margin:0">
+        <button type="button" class="on" data-bkmode="seats">${t('bookSeatsOpt')}<br><small>${r.fare?`${t('rs')} ${money(r.fare)} ${t('perSeat')}`:t('fareOnCall')}</small></button>
+        <button type="button" data-bkmode="whole">${t('bookWholeOpt')}<br><small>${t('rs')} ${money(r.wholeFare)}</small></button></div>`:''}
+      <div id="bkSeatsBox"><label>${t('howManySeats')}</label><div class="stepper"><button type="button" data-bstep="-1" aria-label="−">−</button><input type="number" name="seats" min="1" max="${max}" value="1" inputmode="numeric"><button type="button" data-bstep="1" aria-label="+">+</button></div>
+        <div class="hint">${t('seatsLeft',{n:max})}</div></div>
+      <div class="fgrid">
+        <div><label>${t('nameL')}</label><input name="name" maxlength="50" value="${esc(me.name)}" autocomplete="name"></div>
+        <div><label>${t('phoneL')}</label><input name="phone" class="ltr" maxlength="20" value="${esc(me.phone)}" placeholder="03xx xxxxxxx" inputmode="tel" autocomplete="tel"></div>
+        <div class="full"><label>${t('notesL')} (${t('optional')})</label><input name="note" maxlength="200" placeholder="${t('ph_bookNote')}"></div>
+      </div>
+      <div class="total" id="bkTotal"></div>
+      <div class="err" id="berr" role="alert"></div>
+      <div class="submitbar"><button class="btn big wide" type="submit">${t('sendReq')}</button><button class="btn ghost big" type="button" data-close="1">${t('cancel')}</button></div>
+    </form>
+  </div>`;
+}
+function bindBook(r){
+  const f = $('#bform'); let whole = false;
+  const total = ()=>{ const n=Number(f.seats.value)||1;
+    $('#bkTotal').textContent = whole ? `${t('total')}: ${t('rs')} ${money(r.wholeFare)}` : (r.fare ? `${t('total')}: ${t('rs')} ${money(n*r.fare)}` : ''); };
+  f.querySelectorAll('[data-bkmode]').forEach(b=>b.onclick=()=>{ whole = b.dataset.bkmode==='whole';
+    f.querySelectorAll('[data-bkmode]').forEach(x=>x.classList.toggle('on', x===b)); $('#bkSeatsBox').style.display = whole?'none':''; total(); });
+  f.querySelectorAll('[data-bstep]').forEach(b=>b.onclick=()=>{ f.seats.value=Math.min(Number(r.seats)||1, Math.max(1,(Number(f.seats.value)||1)+Number(b.dataset.bstep))); total(); });
+  f.seats.oninput = total; total();
+  f.onsubmit = async e=>{
+    e.preventDefault();
+    const err = k=>{ $('#berr').textContent=t('err_'+k); };
+    const name=f.name.value.trim(), phone=f.phone.value.trim(), seats=Number(f.seats.value);
+    if(!name) return err('name');
+    if(!validPhone(phone)) return err('phone');
+    if(!whole && !(seats>=1 && seats<=Number(r.seats))) return err('full');
+    store('hm_me_name', name); store('hm_me_phone', phone);
+    const btn=f.querySelector('[type=submit]'); btn.disabled=true; btn.textContent=t('sending');
+    try{
+      await Store.book(r.id, { name, phone, seats, whole, note: f.note.value.trim() });
+      const n = whole ? t('wholeCar') : t('seatsN',{n:seats});
+      nudge(t('reqSent'), t('reqSentSub'), r.phone, t('wa_book',{n, r:routeName(r.from,r.to), d:fmtDate(r.date,r.time)}), t('tellDriver'), true);
+    }catch(ex){ $('#berr').textContent=errText(ex); btn.disabled=false; btn.textContent=t('tryAgain'); }
+  };
+}
+function nudge(title, sub, phone, msg, btnLabel, showMine){
+  $('#modalBox').innerHTML = `<div class="dbody nudge">
+    <div class="tick">✓</div><h2>${esc(title)}</h2><p class="lede" style="margin:0">${esc(sub)}</p>
+    <a class="btn big" href="${waLink(phone,msg)}" target="_blank" rel="noopener">${ICON.wa} ${esc(btnLabel)}</a>
+    ${showMine?`<a class="btn ghost" href="#mine" data-close="1">${t('seeMine')}</a>`:`<button class="btn ghost" data-close="1">${t('close')}</button>`}
+  </div>`;
+  $('#modal').classList.add('show');
+}
+function bookActions(b, role){
+  const A = (a, style='ghost', confirm=false) => `<button class="btn ${style} sm" data-bact="${b.id}|${a}|${role}|${b.rideId}" ${confirm?'data-confirm="1"':''}>${t('a_'+a)}</button>`;
+  const other = role==='driver'?'passenger':'driver';
+  if(b.status==='pending') return role==='driver' ? A('accept','',false)+A('decline','red',true) : A('withdraw','red',true);
+  if(b.status!=='confirmed') return '';
+  if(!b.cancelReq) return A('request_cancel','red',true);
+  if(b.cancelReq===role) return A('undo_cancel');
+  if(b.cancelReq===other) return A('approve_cancel','red',true)+A('reject_cancel');
+  return '';
+}
+function cancelNote(b, role){
+  if(b.status!=='confirmed' || !b.cancelReq) return '';
+  if(b.cancelReq===role) return `<div class="ask soft">${t('cr_mine')}</div>`;
+  return `<div class="ask">${t(role==='driver'?'cr_passenger_to_d':'cr_driver_to_p')}</div>`;
+}
+function passengerBookingCard(b){
+  const r = b.ride;
+  const head = r ? esc(routeName(r.from,r.to)) : '—';
+  const fare = b.whole ? (r&&r.wholeFare) : (r&&r.fare ? r.fare*b.seats : null);
+  return `<div class="bk">
+    <div class="bkhead"><b>${head}</b><span class="st ${b.status}">${bkStatus(b,'passenger')}</span></div>
+    ${r?`<div class="line">${IC.cal}<span>${esc(fmtDate(r.date))}</span><span class="sep">•</span>${IC.clock}<span class="ltr">${esc(fmtTime(r.time))}</span></div>`:''}
+    <div class="line"><span>${seatsText(b)}</span>${fare?`<span class="sep">•</span><b>${t('rs')} ${money(fare)}</b>`:''}${r?`<span class="sep">•</span><span>${t('driverL')}: ${esc(r.name)}</span>`:''}</div>
+    ${cancelNote(b,'passenger')}
+    <div class="row">${bookActions(b,'passenger')}${r&&['pending','confirmed'].includes(b.status)?`<a class="btn sm" href="${waLink(r.phone, t('wa_hello',{r:routeName(r.from,r.to), d:fmtDate(r.date,r.time)}))}" target="_blank" rel="noopener">${ICON.wa} ${t('whatsapp')}</a>`:''}</div>
+  </div>`;
+}
+function driverBookingRow(b, ride){
+  return `<div class="bk">
+    <div class="bkhead"><b>${esc(b.name)}</b><span class="st ${b.status}">${bkStatus(b,'driver')}</span></div>
+    <div class="line"><span>${seatsText(b)}</span><span class="sep">•</span><span class="ltr">${esc(b.phone)}</span></div>
+    ${b.note?`<div class="hint" style="margin:0">${esc(b.note)}</div>`:''}
+    ${cancelNote(b,'driver')}
+    <div class="row">${bookActions(b,'driver')}${['pending','confirmed'].includes(b.status)?`<a class="btn sm" href="${waLink(b.phone, t('wa_hello_p',{r:routeName(ride.from,ride.to), d:fmtDate(ride.date,ride.time)}))}" target="_blank" rel="noopener">${ICON.wa} ${t('whatsapp')}</a>`:''}</div>
+  </div>`;
+}
+function driverPanel(ride){
+  const list = (Store.B.driver[ride.id]||[]).slice().sort((a,b)=>(['pending','confirmed'].includes(a.status)?0:1)-(['pending','confirmed'].includes(b.status)?0:1));
+  return `<div class="bkpanel"><div class="bkhead"><b>${t('bookingsOnRide')} (${list.filter(b=>['pending','confirmed'].includes(b.status)).length})</b></div>
+    ${list.length?list.map(b=>driverBookingRow(b, ride)).join(''):`<div class="hint">${t('noBookings')}</div>`}</div>`;
+}
+function needsMe(){
+  let n=0;
+  for(const id in Store.B.driver) for(const b of Store.B.driver[id]) if(b.status==='pending' || (b.status==='confirmed' && b.cancelReq==='passenger')) n++;
+  for(const b of Store.B.passenger) if(b.status==='confirmed' && b.cancelReq==='driver') n++;
+  return n;
+}
+async function doBookAction(id, action, role, rideId){
+  const token = role==='driver' ? Store.tokens[rideId] : Store.btokens[id];
+  await Store.call('POST', `/api/bookings/${id}/action`, { action }, token);
+  // what we just changed, before refreshing
+  const b = role==='driver' ? (Store.B.driver[rideId]||[]).find(x=>x.id===id) : Store.B.passenger.find(x=>x.id===id);
+  const ride = role==='driver' ? Store.rides.find(r=>r.id===rideId) : b && b.ride;
+  await Store.refresh();
+  if(!b || !ride) return;
+  const ctx = { n: seatsText(b), r: routeName(ride.from, ride.to), d: fmtDate(ride.date, ride.time) };
+  const otherPhone = role==='driver' ? b.phone : ride.phone;
+  const tell = role==='driver' ? t('tellPassenger') : t('tellDriver');
+  const msgs = { accept:'wa_accept', decline:'wa_decline', request_cancel: role==='driver'?'wa_cancel_d':'wa_cancel_p', approve_cancel:'wa_cancelled' };
+  if(msgs[action]) nudge(t('a_done_'+action), t('tellOther'), otherPhone, t(msgs[action], ctx), tell, false);
+  else toast(t('saved'));
+}
 
 /* ================= views ================= */
 const banner = () => Store.error ? `<div class="banner">${t('offline')}</div>` : '';
@@ -836,6 +1038,7 @@ function viewPost(){
       ${isR?`
         <div><label>${t('seatsAvail')}</label>${stepper(3)}</div>
         <div><label>${t('farePerSeat')}</label><input type="number" name="fare" min="0" step="50" placeholder="1200" inputmode="numeric"><div class="hint fare" id="fareHint"></div></div>
+        <div class="full"><label>${t('wholeFareL')}</label><input type="number" name="wholeFare" min="0" step="100" placeholder="4500" inputmode="numeric"><div class="hint">${t('wholeHint')}</div></div>
         <div class="full"><label>${t('whoCan')}</label><div class="checks">${SEATS.map(k=>`<label><input type="checkbox" name="allows" value="${k}" ${k!=='female'?'checked':''}> ${t('seat_'+k)}</label>`).join('')}</div></div>
         <div><label>${t('lugSpace')}</label><select name="luggage">${['light','medium','heavy'].map(k=>`<option value="${k}" ${k==='medium'?'selected':''}>${t('lug_'+k)}</option>`).join('')}</select></div>
         <div><label>${t('car')}</label><input name="car" maxlength="40" placeholder="${t('ph_car')}"></div>
@@ -878,7 +1081,7 @@ function bindPost(){
     d.seats = Number(d.seats); if(!(d.seats>=1 && d.seats<=15)) return err('seats');
     if(!d.name) return err('name');
     if(!validPhone(d.phone)) return err('phone');
-    if(postKind==='ride'){ d.allows = fd.getAll('allows'); if(!d.allows.length) return err('allows'); d.fare = d.fare?Number(d.fare):null; }
+    if(postKind==='ride'){ d.allows = fd.getAll('allows'); if(!d.allows.length) return err('allows'); d.fare = d.fare?Number(d.fare):null; d.wholeFare = d.wholeFare?Number(d.wholeFare):null; }
     else d.budget = d.budget?Number(d.budget):null;
     const kind = postKind==='ride'?'rides':'requests', btn = f.querySelector('[type=submit]');
     btn.disabled=true; btn.textContent=t('posting');
@@ -906,8 +1109,10 @@ function viewFares(){
 }
 function viewMine(){
   const r = Store.rides.filter(x=>Store.mine(x)).sort(byWhen), q = Store.requests.filter(x=>Store.mine(x)).sort(byWhen);
+  const bks = Store.B.passenger.slice().sort((a,b)=>(['pending','confirmed'].includes(a.status)?0:1)-(['pending','confirmed'].includes(b.status)?0:1) || b.createdAt-a.createdAt);
   return `${banner()}<div class="pagehead"><h2>${t('mineH')}</h2></div><p class="lede">${t('mineNote')}</p>
-  <h4>${t('myRides')} (${r.length})</h4>${r.length?`<div class="rlist">${r.map(x=>rideCard(x)).join('')}</div>`:`<div class="empty">${t('noMyRides')}</div>`}
+  <h4>${t('myBookings')} (${bks.length})</h4>${bks.length?`<div class="bklist">${bks.map(passengerBookingCard).join('')}</div>`:`<div class="empty">${t('noMyBookings')}</div>`}
+  <h4>${t('myRides')} (${r.length})</h4>${r.length?`<div class="rlist">${r.map(x=>`<div class="ridewrap">${rideCard(x)}${driverPanel(x)}</div>`).join('')}</div>`:`<div class="empty">${t('noMyRides')}</div>`}
   <h4>${t('myReqs')} (${q.length})</h4>${q.length?`<div class="rlist">${q.map(x=>reqCard(x)).join('')}</div>`:`<div class="empty">${t('noMyReqs')}</div>`}`;
 }
 
@@ -937,6 +1142,7 @@ let last = null;
 function render(force){
   const r = route();
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+r));
+  const mineLink = document.querySelector('#nav a[href="#mine"]'); if(mineLink) mineLink.classList.toggle('alert', needsMe()>0);
   const app = $('#app'), key = r==='post' ? 'post'+postKind : r;
   if(r==='post'){ if(force || last!==key) { app.innerHTML=viewPost(); bindPost(); } }
   else if(r==='rides'||r==='requests'){
@@ -976,6 +1182,9 @@ document.addEventListener('click', async e=>{
     else { const q=Store.requests.find(x=>x.id===id); html=`<div class="head"><h2>${esc(t('ridesFor',{r:routeName(q.from,q.to)}))}</h2><button class="btn ghost sm" data-close="1">${t('close')}</button></div><div class="rlist" style="padding:0 16px 16px">${activeRides().filter(r=>rideFits(r,q)).map(r=>rideCard(r,false)).join('')}</div>`; }
     $('#modalBox').innerHTML=html; $('#modal').classList.add('show');
   }
+  if(d.book){ const r=Store.rides.find(x=>x.id===d.book); if(r){ $('#modalBox').innerHTML=bookSheet(r); $('#modal').classList.add('show'); bindBook(r); } return; }
+  if(d.bact){ if(d.confirm && !armed(b, t('tapConfirm'))) return; const [id,action,role,rideId]=d.bact.split('|'); b.disabled=true;
+    try{ await doBookAction(id,action,role,rideId); }catch(ex){ toast(errText(ex)); if(ex.code==='state') await Store.refresh(); } return; }
   if(d.close) $('#modal').classList.remove('show');
 });
 $('#modal').addEventListener('click', e=>{ if(e.target.id==='modal') $('#modal').classList.remove('show'); });
